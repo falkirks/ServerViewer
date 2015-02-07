@@ -1,0 +1,3 @@
+[submodule "lib/raknet"]
+	path = lib/raknet
+	url = https://github.com/PocketMine/RakLib.git

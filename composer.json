@@ -1,0 +1,12 @@
+{
+  "name": "falkirks/ServerViewer",
+  "description": "yep!",
+  "license": "proprietary",
+  "autoload": {
+    "psr-4": {"serverviewer\\": "src/"},
+    "psr-4": {"raknet\\": "lib/raknet"}
+  },
+  "require": {
+    "ext-gd": "*"
+  }
+}
