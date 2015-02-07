@@ -4,7 +4,9 @@
   "license": "proprietary",
   "autoload": {
     "psr-4": {"serverviewer\\": "src/"},
-    "psr-4": {"raknet\\": "lib/raknet"}
+    "psr-4": {"raklib\\": "lib/pocketmine/src/raklib"},
+    "psr-4": {"pocketmine\\": "lib/pocketmine/src/pocketmine"},
+    "psr-4": {"": "lib/pocketmine/src/spl"}
   },
   "require": {
     "ext-gd": "*"
