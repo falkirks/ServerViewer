@@ -50,7 +50,7 @@ class MCPEClient implements Tickable{
                 $pk->cookie = 1;
                 $pk->security = 1;
                 $pk->port = $connection->getPort();
-                $pk->dataArray
+                //TODO waiting on Raklib/#10
                 break;
             default:
                 print get_class($pk);
