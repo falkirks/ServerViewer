@@ -3,10 +3,12 @@
   "description": "yep!",
   "license": "proprietary",
   "autoload": {
-    "psr-4": {"serverviewer\\": "src/"},
-    "psr-4": {"raklib\\": "lib/pocketmine/src/raklib"},
-    "psr-4": {"pocketmine\\": "lib/pocketmine/src/pocketmine"},
-    "psr-4": {"": "lib/pocketmine/src/spl"}
+    "psr-4": {
+      "serverviewer\\": "src/",
+      "raklib\\": "lib/pocketmine/src/raklib/",
+      "pocketmine\\": "lib/pocketmine/src/pocketmine/",
+      "": "lib/pocketmine/src/spl/"
+    }
   },
   "require": {
     "ext-gd": "*"
