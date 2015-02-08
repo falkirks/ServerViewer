@@ -4,6 +4,7 @@ namespace serverviewer\client;
 use raklib\protocol\ACK;
 use raklib\protocol\DATA_PACKET_0;
 use raklib\protocol\DataPacket;
+use pocketmine\network\protocol\DataPacket as PMDataPacket;
 use raklib\protocol\EncapsulatedPacket;
 use raklib\protocol\Packet;
 use raklib\protocol\SERVER_HANDSHAKE_DataPacket;
@@ -44,17 +45,22 @@ class ClientConnection extends UDPServerSocket implements Tickable{
         $packet->encode();
         return $this->writePacket($packet->buffer, $this->ip, $this->port);
     }
-    public function sendEncapsulatedPacket(Packet $packet){
-        $packet->encode();
-        $encapsulated = new EncapsulatedPacket();
-        $encapsulated->reliability = 0;
-        $encapsulated->buffer = $packet->buffer;
+    public function sendEncapsulatedPacket($packet){
+        if($packet instanceof Packet || $packet instanceof PMDataPacket) {
+            $packet->encode();
+            $encapsulated = new EncapsulatedPacket();
+            $encapsulated->reliability = 0;
+            $encapsulated->buffer = $packet->buffer;
 
-        $sendPacket = new DATA_PACKET_0();
-        $sendPacket->seqNumber = $this->sequenceNumber++;
-        $sendPacket->packets[] = $encapsulated->toBinary();
+            $sendPacket = new DATA_PACKET_0();
+            $sendPacket->seqNumber = $this->sequenceNumber++;
+            $sendPacket->packets[] = $encapsulated->toBinary();
 
-        return $this->sendPacket($sendPacket);
+            return $this->sendPacket($sendPacket);
+        }
+        else{
+            return false;
+        }
     }
     public function receivePacket(){
         $this->readPacket($buffer, $this->ip, $this->port);
