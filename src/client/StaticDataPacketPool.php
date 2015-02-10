@@ -23,8 +23,6 @@ use pocketmine\network\protocol\ExplodePacket;
 use pocketmine\network\protocol\HurtArmorPacket;
 use pocketmine\network\protocol\InteractPacket;
 use pocketmine\network\protocol\LevelEventPacket;
-use pocketmine\network\protocol\LoginPacket;
-use pocketmine\network\protocol\LoginStatusPacket;
 use pocketmine\network\protocol\MessagePacket;
 use pocketmine\network\protocol\MoveEntityPacket;
 use pocketmine\network\protocol\MovePlayerPacket;
@@ -51,6 +49,8 @@ use pocketmine\network\protocol\Info as ProtocolInfo;
 use pocketmine\network\protocol\UnloadChunkPacket;
 use pocketmine\network\protocol\UpdateBlockPacket;
 use pocketmine\network\protocol\UseItemPacket;
+use serverviewer\client\protocol\LoginPacket;
+use serverviewer\client\protocol\LoginStatusPacket;
 
 class StaticDataPacketPool {
     private static $packetPool = [];
@@ -77,6 +77,7 @@ class StaticDataPacketPool {
 
     private static function registerPackets(){
         StaticDataPacketPool::$packetPool = new \SplFixedArray(256);
+
 
         StaticDataPacketPool::registerPacket(ProtocolInfo::LOGIN_PACKET, LoginPacket::class);
         StaticDataPacketPool::registerPacket(ProtocolInfo::LOGIN_STATUS_PACKET, LoginStatusPacket::class);

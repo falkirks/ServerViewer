@@ -58,8 +58,8 @@ class MCPEClient implements Tickable{
 
                 $pk = new LoginPacket();
                 $pk->username = "Bobby";
-                $pk->protocol1 = 18;
-                $pk->protocol2 = 18;
+                $pk->protocol1 = 20;
+                $pk->protocol2 = 20;
                 $pk->clientId = 1;
                 $pk->loginData = "blahfooblah";
                 $connection->sendEncapsulatedPacket($pk);

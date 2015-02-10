@@ -3,6 +3,7 @@ namespace serverviewer\client;
 
 use raklib\protocol\ACK;
 use raklib\protocol\DATA_PACKET_0;
+use raklib\protocol\DATA_PACKET_4;
 use raklib\protocol\DataPacket;
 use pocketmine\network\protocol\DataPacket as PMDataPacket;
 use raklib\protocol\EncapsulatedPacket;
@@ -52,8 +53,9 @@ class ClientConnection extends UDPServerSocket implements Tickable{
             $encapsulated->reliability = 0;
             $encapsulated->buffer = $packet->buffer;
 
-            $sendPacket = new DATA_PACKET_0();
+            $sendPacket = new DATA_PACKET_4();
             $sendPacket->seqNumber = $this->sequenceNumber++;
+            $sendPacket->sendTime = microtime(true);
             $sendPacket->packets[] = $encapsulated->toBinary();
 
             return $this->sendPacket($sendPacket);
@@ -63,18 +65,28 @@ class ClientConnection extends UDPServerSocket implements Tickable{
         }
     }
     public function receivePacket(){
-        $this->readPacket($buffer, $this->ip, $this->port);
-        if(($packet = StaticPacketPool::getPacketFromPool(ord($buffer{0}))) !== null){
-            $packet->buffer = $buffer;
-            $packet->decode();
-            if($packet instanceof DATA_PACKET_0){
-                $this->ackQueue[$packet->seqNumber] = $packet->seqNumber;
+        if ($this->readPacket($buffer, $this->ip, $this->port) > 0) {
+            if (($packet = StaticPacketPool::getPacketFromPool(ord($buffer{0}))) !== null) {
+                $packet->buffer = $buffer;
+                $packet->decode();
+                if ($packet instanceof DataPacket) {
+                    $this->ackQueue[$packet->seqNumber] = $packet->seqNumber;
+                }
+                return $packet;
             }
-            return $packet;
+            return $buffer;
         }
-        return $buffer;
+        else{
+            return false;
+        }
     }
     public function tick(){
+        if(count($this->ackQueue) > 0){
+            $ack = new ACK();
+            $ack->packets = $this->ackQueue;
+            $this->sendPacket($ack);
+            $this->ackQueue = [];
+        }
         if(($pk = $this->receivePacket()) instanceof Packet){
             if($pk instanceof DataPacket){
                 foreach($pk->packets as $pk){
@@ -96,11 +108,8 @@ class ClientConnection extends UDPServerSocket implements Tickable{
                 $this->client->handlePacket($this, $pk);
             }
         }
-        if(count($this->ackQueue) > 0){
-            $ack = new ACK();
-            $ack->packets = $this->ackQueue;
-            $this->sendPacket($ack);
-            $this->ackQueue = [];
+        elseif($pk !== false){
+            print $pk . "\n";
         }
     }
 
