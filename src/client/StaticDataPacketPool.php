@@ -20,6 +20,7 @@ use pocketmine\network\protocol\DropItemPacket;
 use pocketmine\network\protocol\EntityDataPacket;
 use pocketmine\network\protocol\EntityEventPacket;
 use pocketmine\network\protocol\ExplodePacket;
+use pocketmine\network\protocol\FullChunkDataPacket;
 use pocketmine\network\protocol\HurtArmorPacket;
 use pocketmine\network\protocol\InteractPacket;
 use pocketmine\network\protocol\LevelEventPacket;
@@ -109,6 +110,7 @@ class StaticDataPacketPool {
         StaticDataPacketPool::registerPacket(ProtocolInfo::PLAYER_ACTION_PACKET, PlayerActionPacket::class);
         StaticDataPacketPool::registerPacket(ProtocolInfo::HURT_ARMOR_PACKET, HurtArmorPacket::class);
         StaticDataPacketPool::registerPacket(ProtocolInfo::SET_ENTITY_DATA_PACKET, SetEntityDataPacket::class);
+        StaticDataPacketPool::registerPacket(ProtocolInfo::FULL_CHUNK_DATA_PACKET, FullChunkDataPacket::class);
         StaticDataPacketPool::registerPacket(ProtocolInfo::SET_ENTITY_MOTION_PACKET, SetEntityMotionPacket::class);
         StaticDataPacketPool::registerPacket(ProtocolInfo::SET_HEALTH_PACKET, SetHealthPacket::class);
         StaticDataPacketPool::registerPacket(ProtocolInfo::SET_SPAWN_POSITION_PACKET, SetSpawnPositionPacket::class);
