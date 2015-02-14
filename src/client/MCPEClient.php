@@ -7,12 +7,13 @@ use raklib\protocol\CLIENT_CONNECT_DataPacket;
 use raklib\protocol\OPEN_CONNECTION_REPLY_1;
 use raklib\protocol\OPEN_CONNECTION_REPLY_2;
 use raklib\protocol\OPEN_CONNECTION_REQUEST_1;
-use raklib\protocol\OPEN_CONNECTION_REQUEST_2;
 use raklib\protocol\Packet;
+use raklib\protocol\PING_DataPacket;
 use raklib\protocol\SERVER_HANDSHAKE_DataPacket;
 use raklib\protocol\UNCONNECTED_PONG;
 use serverviewer\client\protocol\CLIENT_HANDSHAKE_DataPacket;
 use serverviewer\client\protocol\LoginPacket;
+use serverviewer\client\protocol\OPEN_CONNECTION_REQUEST_2;
 use serverviewer\Tickable;
 
 class MCPEClient implements Tickable{
@@ -26,9 +27,12 @@ class MCPEClient implements Tickable{
     public function addConnection($ip, $port){
         $this->connections[] = new ClientConnection($this, $ip, $port);
     }
-    public function handlePacket(ClientConnection $connection, Packet $pk){
-        switch(get_class($pk)){
+    public function handlePacket(ClientConnection $connection, Packet $packet){
+        print "S -> C " . get_class($packet) . "\n";
+        switch(get_class($packet)){
             case UNCONNECTED_PONG::class:
+                $connection->setName($packet->serverName);
+                $connection->setIsConnected(true);
                 $pk = new OPEN_CONNECTION_REQUEST_1();
                 $pk->mtuSize = 1447;
                 $connection->sendPacket($pk);
@@ -36,7 +40,7 @@ class MCPEClient implements Tickable{
             case OPEN_CONNECTION_REPLY_1::class:
                 $pk = new OPEN_CONNECTION_REQUEST_2();
                 $pk->serverPort = $connection->getPort();
-                $pk->mtuSize = 1447;
+                $pk->mtuSize = $packet->mtuSize;
                 $pk->clientID = 1;
                 $connection->sendPacket($pk);
                 break;
@@ -51,7 +55,7 @@ class MCPEClient implements Tickable{
                 $pk->cookie = 1;
                 $pk->security = 1;
                 $pk->port = $connection->getPort();
-                $pk->timestamp = "00";
+                $pk->timestamp = microtime(true);
                 $pk->session = 0;
                 $pk->session2 = 0;
                 $connection->sendEncapsulatedPacket($pk);
@@ -63,14 +67,18 @@ class MCPEClient implements Tickable{
                 $pk->clientId = 1;
                 $pk->loginData = "blahfooblah";
                 $connection->sendEncapsulatedPacket($pk);
+
+                $pk = new PING_DataPacket();
+                $pk->pingID = rand(0, 100);
+                $connection->sendEncapsulatedPacket($pk);
                 break;
             default:
-                print get_class($pk);
+                //print get_class($pk);
                 break;
         }
     }
-    public function handleDataPacket(ClientConnection $connection, DataPacket $packet){
-        print get_class($packet);
+    public function handleDataPacket(ClientConnection $connection, DataPacket $pk){
+        print "S -> C " . get_class($pk) . "\n";
     }
     /**
      * @return mixed

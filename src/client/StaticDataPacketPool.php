@@ -49,6 +49,7 @@ use pocketmine\network\protocol\Info as ProtocolInfo;
 use pocketmine\network\protocol\UnloadChunkPacket;
 use pocketmine\network\protocol\UpdateBlockPacket;
 use pocketmine\network\protocol\UseItemPacket;
+use raklib\protocol\PONG_DataPacket;
 use serverviewer\client\protocol\LoginPacket;
 use serverviewer\client\protocol\LoginStatusPacket;
 
@@ -78,7 +79,7 @@ class StaticDataPacketPool {
     private static function registerPackets(){
         StaticDataPacketPool::$packetPool = new \SplFixedArray(256);
 
-
+        //StaticDataPacketPool::registerPacket(PONG_DataPacket::$ID, PONG_DataPacket::class);
         StaticDataPacketPool::registerPacket(ProtocolInfo::LOGIN_PACKET, LoginPacket::class);
         StaticDataPacketPool::registerPacket(ProtocolInfo::LOGIN_STATUS_PACKET, LoginStatusPacket::class);
         StaticDataPacketPool::registerPacket(ProtocolInfo::MESSAGE_PACKET, MessagePacket::class);

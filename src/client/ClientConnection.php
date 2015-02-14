@@ -8,22 +8,30 @@ use raklib\protocol\DataPacket;
 use pocketmine\network\protocol\DataPacket as PMDataPacket;
 use raklib\protocol\EncapsulatedPacket;
 use raklib\protocol\Packet;
+use raklib\protocol\PONG_DataPacket;
 use raklib\protocol\SERVER_HANDSHAKE_DataPacket;
 use raklib\protocol\UNCONNECTED_PING;
 use raklib\server\UDPServerSocket;
 use serverviewer\Tickable;
 
 class ClientConnection extends UDPServerSocket implements Tickable{
-    const START_PORT = 49152;
+    const START_PORT = 49666;
     private static $instanceId = 0;
+
+    private $isConnected;
 
     /** @var  MCPEClient */
     private $client;
     private $ip;
     private $port;
 
+    private $name;
+
     private $sequenceNumber;
     private $ackQueue;
+
+    private $lastSendTime;
+    private $pingCount;
 
     public function __construct(MCPEClient $client, $ip, $port){
         $this->socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
@@ -38,16 +46,38 @@ class ClientConnection extends UDPServerSocket implements Tickable{
         $this->client = $client;
         $this->ip = $ip;
         $this->port = $port;
+        $this->name = "";
         $this->sequenceNumber = 0;
         $this->ackQueue = [];
-        $this->sendPacket(new UNCONNECTED_PING()); // Initiate connection
+        $this->isConnected = false;
+        $this->lastSendTime = -1;
+        $this->pingCount = 0;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
     }
     public function sendPacket(Packet $packet){
+        print "C -> S " . get_class($packet) . "\n";
+        $this->lastSendTime = time();
         $packet->encode();
         return $this->writePacket($packet->buffer, $this->ip, $this->port);
     }
     public function sendEncapsulatedPacket($packet){
         if($packet instanceof Packet || $packet instanceof PMDataPacket) {
+            print "C -> S " . get_class($packet) . "\n";
             $packet->encode();
             $encapsulated = new EncapsulatedPacket();
             $encapsulated->reliability = 0;
@@ -81,6 +111,11 @@ class ClientConnection extends UDPServerSocket implements Tickable{
         }
     }
     public function tick(){
+        if(!$this->isConnected() && $this->lastSendTime !== time()){
+            $ping = new UNCONNECTED_PING();
+            $ping->pingID = $this->pingCount++;
+            $this->sendPacket($ping);
+        }
         if(count($this->ackQueue) > 0){
             $ack = new ACK();
             $ack->packets = $this->ackQueue;
@@ -93,6 +128,12 @@ class ClientConnection extends UDPServerSocket implements Tickable{
                     $id = ord($pk->buffer{0});
                     if(SERVER_HANDSHAKE_DataPacket::$ID === $id){
                         $new = new SERVER_HANDSHAKE_DataPacket();
+                        $new->buffer = $pk->buffer;
+                        $new->decode();
+                        $this->client->handlePacket($this, $new);
+                    }
+                    elseif(PONG_DataPacket::$ID === $id){
+                        $new = new PONG_DataPacket();
                         $new->buffer = $pk->buffer;
                         $new->decode();
                         $this->client->handlePacket($this, $new);
@@ -132,6 +173,20 @@ class ClientConnection extends UDPServerSocket implements Tickable{
      */
     public function getPort(){
         return $this->port;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isConnected(){
+        return $this->isConnected;
+    }
+
+    /**
+     * @param boolean $isConnected
+     */
+    public function setIsConnected($isConnected){
+        $this->isConnected = $isConnected;
     }
 
 }

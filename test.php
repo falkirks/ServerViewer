@@ -6,4 +6,5 @@ $client->addConnection("127.0.0.1", 19132);
 
 while(true){
     $client->tick();
+    usleep(1000);
 }
