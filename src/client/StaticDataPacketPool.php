@@ -20,7 +20,6 @@ use pocketmine\network\protocol\DropItemPacket;
 use pocketmine\network\protocol\EntityDataPacket;
 use pocketmine\network\protocol\EntityEventPacket;
 use pocketmine\network\protocol\ExplodePacket;
-use pocketmine\network\protocol\FullChunkDataPacket;
 use pocketmine\network\protocol\HurtArmorPacket;
 use pocketmine\network\protocol\InteractPacket;
 use pocketmine\network\protocol\LevelEventPacket;
@@ -51,6 +50,7 @@ use pocketmine\network\protocol\UnloadChunkPacket;
 use pocketmine\network\protocol\UpdateBlockPacket;
 use pocketmine\network\protocol\UseItemPacket;
 use raklib\protocol\PONG_DataPacket;
+use serverviewer\client\protocol\FullChunkDataPacket;
 use serverviewer\client\protocol\LoginPacket;
 use serverviewer\client\protocol\LoginStatusPacket;
 

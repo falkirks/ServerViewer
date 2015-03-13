@@ -116,7 +116,7 @@ class ClientConnection extends UDPServerSocket implements Tickable{
             $ping->pingID = $this->pingCount++;
             $this->sendPacket($ping);
         }
-        if(count($this->ackQueue) > 0){
+        if(count($this->ackQueue) > 0 && $this->lastSendTime !== time()){
             $ack = new ACK();
             $ack->packets = $this->ackQueue;
             $this->sendPacket($ack);
